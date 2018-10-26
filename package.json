@@ -1,0 +1,48 @@
+{
+  "name": "LaundryDelivery",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "native-base": "^2.8.0",
+    "react": "16.4.1",
+    "react-native": "^0.56.0",
+    "react-native-vector-icons": "^5.0.0",
+    "react-navigation": "^2.17.0",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-saga": "^0.16.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "async": "^2.4.0",
+    "babel-eslint": "9.0.0",
+    "babel-generator": "^6.26.0",
+    "babel-jest": "23.2.0",
+    "babel-preset-react-native": "^5.0.2",
+    "detox": "^8.2.3",
+    "eslint": "5.1.0",
+    "eslint-config-fb-strict": "22.1.0",
+    "eslint-config-fbjs": "2.0.1",
+    "eslint-plugin-eslint-comments": "^3.0.1",
+    "eslint-plugin-flowtype": "2.43.0",
+    "eslint-plugin-jest": "21.8.0",
+    "eslint-plugin-prettier": "2.6.0",
+    "eslint-plugin-react": "7.8.2",
+    "eslint-plugin-react-native": "^3.2.1",
+    "jest": "23.6.0",
+    "metro-react-native-babel-preset": "0.48.1",
+    "react-test-renderer": "16.6.0-alpha.8af6728"
+  },
+  "jest": {
+    "preset": [
+      "react-native",
+      "@babel/preset-env"
+    ]
+  }
+}
