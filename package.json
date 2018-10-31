@@ -8,14 +8,20 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "lodash": "^4.17.11",
     "native-base": "^2.8.0",
     "react": "16.4.1",
     "react-native": "^0.56.0",
+    "react-native-maps": "^0.22.0",
+    "react-native-popup-dialog": "^0.16.1",
+    "react-native-step-indicator": "0.0.9",
+    "react-native-timeline-listview": "^0.2.3",
     "react-native-vector-icons": "^5.0.0",
     "react-navigation": "^2.17.0",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
-    "redux-saga": "^0.16.0"
+    "redux-saga": "^0.16.0",
+    "rn-viewpager": "^1.2.9"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

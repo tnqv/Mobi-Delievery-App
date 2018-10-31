@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View,Text, StyleSheet, ImageBackground,Image} from 'react-native';
+import {View,Text, StyleSheet, ImageBackground,Image,TouchableOpacity} from 'react-native';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as appActions from '../actions';
@@ -22,40 +22,72 @@ class Menu extends Component {
     const fromScreen = navigation.getParam('from', 'loginButton');
 
     return (
-      <Container style={{backgroundColor: colors.menuBackground}}>
+      <Container style={{backgroundColor: colors.lightgray}}>
           {
           //Header
           }
-          <Image style={{ width: 200, height: 200,
+          <Image style={{ width: 150, height: 150,
                       justifyContent:'center',
-                      alignSelf: 'center'}}  source={require('../assets/opacity-login.png')}>
+                      borderRadius: 100,
+                      borderWidth: 10,
+                      alignSelf: 'center'}}  source={require('../assets/l60Hf.png')}>
+
 
           </Image>
+              <Text
+                style={{ justifyContent:'center',
+                fontSize: 32,
+                alignSelf: 'center'}}>
+                Vu Tran
+              </Text>
               <Grid style={{flex:1,alignItems:'center',margin: 20}}>
-                  <Col style={{ backgroundColor: colors.menuBackground,marginRight: 20}}>
+                  <Col style={{backgroundColor: colors.menuBackground,marginRight: 20}}>
                     <Row style={{
                           marginBottom: 20,
                           ...styles.menuStyle
                           }}
-                          onPress={()=> navigation.navigate('GetOrder')}>
-                      <Icon name='home' type='FontAwesome'></Icon>
-                      <Text>Nhận hàng</Text>
+                          // onPress={()=> navigation.navigate('GetOrder')}>
+                          >
+                      <TouchableOpacity
+                        style={styles.touchStyle}
+                        onPress={()=> navigation.navigate('GetOrder')}>
+                        <Icon style={{fontSize:60,}} name='truck' type='FontAwesome'></Icon>
+
+                        <Text style={{fontSize: 16}}>Đơn xử lý</Text>
+                      </TouchableOpacity>
+
                     </Row>
                     <Row style={styles.menuStyle}>
-
+                      <TouchableOpacity>
+                        <Icon name='home' type='FontAwesome'></Icon>
+                        <Text>Trạng thái</Text>
+                      </TouchableOpacity>
                     </Row>
 
                   </Col>
                   <Col style={{ backgroundColor: colors.menuBackground}}>
                     <Row style={{...styles.menuStyle,
-                                 marginBottom: 20,}}
-                         onPress={()=> navigation.navigate('DeliverOrder')}>
-                                 <Icon name="truck" type='FontAwesome'></Icon>
-                                 <Text>Giao hàng</Text>
+                                 marginBottom: 20,}}>
+                                 <TouchableOpacity
+                                 style={styles.touchStyle}
+                                  onPress={()=> navigation.navigate('DeliverOrder')}>
+                                   <Icon style={{fontSize:60,}} name="local-laundry-service" type='MaterialIcons'></Icon>
+
+                                    <Text style={{fontSize: 16}}>Đơn đang giặt</Text>
+
+                                </TouchableOpacity>
                       </Row>
                       <Row style={styles.menuStyle}>
-                                 <Icon name="truck" type='FontAwesome'></Icon>
-                                 <Text>Đăng xuất</Text>
+                                <TouchableOpacity
+                                  style={styles.touchStyle}
+                                  >
+                                   <Icon style={{fontSize:60,}} name="sign-out" type='FontAwesome'></Icon>
+
+                                    <Text style={{fontSize: 16}}>Đơn đang giặt</Text>
+
+                                </TouchableOpacity>
+                                 {/* <Icon name="sign-out" type='FontAwesome'></Icon>
+                                 <Text>Đăng xuất</Text> */}
                       </Row>
                   </Col>
 
@@ -96,6 +128,13 @@ class Menu extends Component {
 }
 
 const styles = StyleSheet.create({
+  touchStyle: {
+    alignItems:'center',
+    justifyContent: 'center',
+    flexDirection:'column',
+    flex: 1,
+
+  },
   menuStyle: {
     backgroundColor: colors.white,
     borderWidth: 1,
@@ -108,6 +147,7 @@ const styles = StyleSheet.create({
     elevation: 1,
     alignItems:'center',
     justifyContent: 'center',
+    flexDirection:'column',
   },
   loginForm: {
       height: 320,
@@ -140,7 +180,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(appActions.actions, dispatch)
+    // actions: bindActionCreators(appActions.actions, dispatch)
   };
 }
 

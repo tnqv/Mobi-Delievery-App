@@ -6,8 +6,25 @@ import Menu from '../containers/menu';
 import LoginPage from '../containers/loginPage';
 import DeliverOrder from '../containers/deliverOrder';
 import GetOrder from '../containers/getOrder';
+import OrderDetail from '../containers/orderDetail';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import NavigatorService from '../services/navigator';
+
+// const detailStack = createStackNavigator({
+//   GetOrder: {
+//     screen: GetOrder,
+//     navigationOptions: {
+//       header: null,
+//     },
+//   },
+
+// },{
+//   initialRouteName: 'GetOrder',
+//   mode: 'modal',
+//   headerMode: 'none',
+
+// })
 
 const AppFunctionStackNavigator = createStackNavigator( {
   Menu: {
@@ -27,6 +44,13 @@ const AppFunctionStackNavigator = createStackNavigator( {
       navigationOptions: {
         header: null,
       },
+  },
+
+  OrderDetail: {
+    screen: OrderDetail,
+    navigationOptions: {
+      header: null,
+    },
   }
 },
 {
@@ -63,7 +87,10 @@ class AppStack extends Component {
     }
 
     const AppStackNavigate = AppSwitchNavigatior(loggedIn);
-    return <AppStackNavigate />;
+    return <AppStackNavigate
+              ref={navigatorRef => {
+                NavigatorService.setTopLevelNavigator(navigatorRef);
+              }} />;
 
   }
 }

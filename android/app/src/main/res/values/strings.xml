@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">LaundryDelivery</string>
+    <string name="google_map_key">AIzaSyDZX1AjUUvJydL7kbBpmar-NUPSuUoStDY</string>
 </resources>
