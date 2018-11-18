@@ -28,6 +28,7 @@ const colors = {
   orange: "#FF9501",
   lightGreen: "#90EE90",
   menuBackground: "#ECF2F4",
+  red: '#FF0000',
 
 
 };

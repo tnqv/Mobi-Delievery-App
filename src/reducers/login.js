@@ -1,6 +1,4 @@
-import { API_LOGIN_REQUEST,API_LOGIN_REQUEST_FAILED,API_LOGIN_REQUEST_SUCCEEDED, FACEBOOK_LOGIN, FACEBOOK_LOGIN_SUCCEED, FACEBOOK_LOGIN_FAILED,LOAD_TOKEN_FROM_STORAGE,LOAD_TOKEN_FROM_STORAGE_SUCCEEDED,LOAD_TOKEN_FROM_STORAGE_FAILED } from '../actions/actionTypes';
-
-
+import { API_LOGIN_REQUEST,API_LOGIN_REQUEST_FAILED,API_LOGIN_REQUEST_SUCCEEDED,REMOVE_ERROR } from '../actions/actionTypes';
 
 const initialState = {
   loading: false,
@@ -17,16 +15,17 @@ export default function (state = initialState, action) {
       return {
         ...state,
         loading: true,
+        error: null,
       }
     case API_LOGIN_REQUEST_SUCCEEDED:
       console.log("yield success",state);
-      console.log(action.results.info);
       return {
         ...state,
+        error: null,
         loading: false,
-        results: action.results,
-        token: action.results.info.account.token,
-        user: action.results.info.user,
+        results: action.result,
+        token: action.result.account.token,
+        user: action.result.user,
       };
     case API_LOGIN_REQUEST_FAILED:
       return {
@@ -34,6 +33,11 @@ export default function (state = initialState, action) {
         loading: false,
         error: action.error,
       };
+    case REMOVE_ERROR:
+      return {
+        ...state,
+        error: null,
+      }
     default:
       return state;
   }

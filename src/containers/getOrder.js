@@ -4,7 +4,6 @@ import {View, Image, FlatList,SectionList,StyleSheet, Dimensions,TouchableOpacit
   Animated,} from 'react-native';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import * as appActions from '../actions';
 import colors from '../config/colors';
 import { Container, Header, Left, Body, Right, Grid, Card, CardItem, Title,Content, List, ListItem,Text,Button,Col,Row } from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome5';
@@ -12,6 +11,8 @@ import {IndicatorViewPager,PagerDotIndicator,PagerTitleIndicator} from 'rn-viewp
 import NavigatorService from '../services/navigator';
 import MapView from "react-native-maps";
 import OrderMap from "../components/orderMap";
+import * as appActions from '../actions';
+
 
 const windowWidth = Dimensions.get('window').width;
 class GetOrder extends Component {
@@ -29,8 +30,10 @@ class GetOrder extends Component {
     }
   }
 
-  async componentDidMount () {
-
+  componentDidMount () {
+    let tokenFromState = this.props.account.token;
+    let userIdFromState = this.props.account.user.ID;
+    this.props.onLoadActiveOrders({deliveryId : userIdFromState, token : tokenFromState});
   }
 
   componentWillMount(){
@@ -38,7 +41,7 @@ class GetOrder extends Component {
 
   _renderTitleIndicator() {
     return  <PagerTitleIndicator
-                titles={["Đơn đang chờ","Đơn xác nhận"]}
+                titles={["Đơn đang chờ","Đơn đã lấy"]}
                 style={styles.indicatorContainer}
                 trackScroll={true}
                 itemTextStyle={styles.indicatorText}
@@ -50,10 +53,14 @@ class GetOrder extends Component {
   }
 
   _renderItem = ({item,index,section}) => {
+    const date = new Date(item.time_placed);
+
     return (
       <TouchableOpacity onPress={() =>{
         console.log("test");
-        this.props.navigation.navigate('OrderDetail');
+        this.props.navigation.navigate('OrderDetail',{
+          orderId: item.ID,
+        });
         }}>
       <Card style={{ marginTop: 15, marginBottom: 15, marginLeft: 20, marginRight: 20 }}>
         <View style={{marginTop:15,
@@ -65,11 +72,11 @@ class GetOrder extends Component {
               <Left style={{flexDirection: 'row', textAlign: 'left', textAlignVertical: 'center',flex:2}}>
                   <Text style={{color: colors.gray, fontWeight: 'bold',fontSize:18}}>Mã hoá đơn</Text>
                   <Text> - </Text>
-                  <Text style={{color: colors.gray}}>#123456</Text>
+                  <Text style={{color: colors.gray}}>#{item.order_code}</Text>
               </Left>
               <Right style={{flex:1}}>
                   <Button info>
-                    <Text>Đang chờ</Text>
+                    <Text style={{fontSize: 12,}}>Đang chờ</Text>
                   </Button>
               </Right>
         </View>
@@ -79,7 +86,7 @@ class GetOrder extends Component {
               <Row>
                     <Text>
                       Thời gian đặt hàng:{"     "}
-                      <Text style={{color: colors.gray,fontSize:14,}}>2018/10/21 12:08:00</Text>
+                      <Text style={{color: colors.gray,fontSize:14,}}>{`${date.getDate()}-${date.getMonth() +1 }-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}</Text>
                     </Text>
 
               </Row>
@@ -88,13 +95,13 @@ class GetOrder extends Component {
                   <Text>
                     Địa chỉ
                   </Text>
-                  <Text style={{color: colors.gray,fontSize:14}}>399/12 Hồ Tùng Mậu</Text>
+                  <Text style={{color: colors.gray,fontSize:14}}>{item.delivery_address}</Text>
                 </Col>
                 <Col>
                 <Text>
                   Địa điểm giặt
                 </Text>
-                <Text style={{color: colors.gray,fontSize:14}}>399/12 Hồ Tùng Mậu</Text>
+                <Text style={{color: colors.gray,fontSize:14}}>{item.store.address}</Text>
                 </Col>
               </Row>
             </Grid>
@@ -136,14 +143,14 @@ class GetOrder extends Component {
                     indicator={this._renderTitleIndicator()}
                 >
                     <View style={{backgroundColor: colors.lightgray}}>
-                        {/* <OrderMap></OrderMap> */}
+                        <OrderMap></OrderMap>
                     </View>
                     <View style={{backgroundColor: colors.lightgray}}>
                          <FlatList
                             style={{backgroundColor:'transparent'}}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={this._renderItem}
-                            data={this.state.data}
+                            data={this.props.activePlacedOrders.activeOrders}
                             navigation={navigation}
                           />
                     </View>
@@ -273,12 +280,16 @@ const styles = StyleSheet.create({
 function mapStateToProps(state) {
   return {
     state: state,
-    login: state.login,
+    account: state.login,
+    activePlacedOrders : state.activePlacedOrders,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
+    onLoadActiveOrders: (params) => {
+      dispatch(appActions.actions.fetchActiveOrdersRequest(params));
+    },
     // actions: bindActionCreators(appActions.actions, dispatch),
   };
 }

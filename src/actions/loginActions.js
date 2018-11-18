@@ -21,3 +21,9 @@ export function loginRequestFailed(payload) {
     payload: payload
   }
 }
+export function okFromDialog(payload){
+  return {
+    type: types.REMOVE_ERROR,
+    payload: payload,
+  }
+}

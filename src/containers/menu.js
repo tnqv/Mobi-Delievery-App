@@ -22,23 +22,32 @@ class Menu extends Component {
     const fromScreen = navigation.getParam('from', 'loginButton');
 
     return (
-      <Container style={{backgroundColor: colors.lightgray}}>
+      <Container style={{backgroundColor: colors.menuBackground}}>
           {
           //Header
           }
-          <Image style={{ width: 150, height: 150,
-                      justifyContent:'center',
-                      borderRadius: 100,
-                      borderWidth: 10,
-                      alignSelf: 'center'}}  source={require('../assets/l60Hf.png')}>
+          { this.props.account.user.imageurl === "" ||  !this.props.account.user.imageurl ?
+            <Image style={{
+                        marginTop: 20,
+                        width: 150, height: 150,
+                        justifyContent:'center',
+                        borderRadius: 100,
+                        alignSelf: 'center'}}  source={require("../assets/l60Hf.png")}></Image>
+            :
+            <Image style={{
+                        marginTop: 20,
+                        width: 150, height: 150,
+                        justifyContent:'center',
+                        borderRadius: 100,
+                        alignSelf: 'center'}}  source={{ uri: this.props.account.user.imageurl}}></Image>
+            }
 
-
-          </Image>
               <Text
                 style={{ justifyContent:'center',
                 fontSize: 32,
+                color:colors.gray,
                 alignSelf: 'center'}}>
-                Vu Tran
+                {this.props.account.user.name}
               </Text>
               <Grid style={{flex:1,alignItems:'center',margin: 20}}>
                   <Col style={{backgroundColor: colors.menuBackground,marginRight: 20}}>
@@ -51,17 +60,21 @@ class Menu extends Component {
                       <TouchableOpacity
                         style={styles.touchStyle}
                         onPress={()=> navigation.navigate('GetOrder')}>
-                        <Icon style={{fontSize:60,}} name='truck' type='FontAwesome'></Icon>
+                        <Icon style={styles.iconMenu} name='truck' type='FontAwesome'></Icon>
 
-                        <Text style={{fontSize: 16}}>Đơn xử lý</Text>
+                        <Text style={styles.textMenu}>Đơn xử lý</Text>
                       </TouchableOpacity>
 
                     </Row>
                     <Row style={styles.menuStyle}>
-                      <TouchableOpacity>
-                        <Icon name='home' type='FontAwesome'></Icon>
-                        <Text>Trạng thái</Text>
-                      </TouchableOpacity>
+                               <TouchableOpacity
+                                  style={styles.touchStyle}
+                                  >
+                                   <Icon style={styles.iconMenu} name="sign-out" type='FontAwesome'></Icon>
+
+                                    <Text style={styles.textMenu}>Trạng thái</Text>
+
+                                </TouchableOpacity>
                     </Row>
 
                   </Col>
@@ -71,9 +84,9 @@ class Menu extends Component {
                                  <TouchableOpacity
                                  style={styles.touchStyle}
                                   onPress={()=> navigation.navigate('DeliverOrder')}>
-                                   <Icon style={{fontSize:60,}} name="local-laundry-service" type='MaterialIcons'></Icon>
+                                   <Icon style={styles.iconMenu} name="local-laundry-service" type='MaterialIcons'></Icon>
 
-                                    <Text style={{fontSize: 16}}>Đơn đang giặt</Text>
+                                    <Text style={styles.textMenu}>Đơn đang giặt</Text>
 
                                 </TouchableOpacity>
                       </Row>
@@ -81,9 +94,9 @@ class Menu extends Component {
                                 <TouchableOpacity
                                   style={styles.touchStyle}
                                   >
-                                   <Icon style={{fontSize:60,}} name="sign-out" type='FontAwesome'></Icon>
+                                   <Icon style={styles.iconMenu} name="sign-out" type='FontAwesome'></Icon>
 
-                                    <Text style={{fontSize: 16}}>Đơn đang giặt</Text>
+                                    <Text style={styles.textMenu}>Đăng xuất</Text>
 
                                 </TouchableOpacity>
                                  {/* <Icon name="sign-out" type='FontAwesome'></Icon>
@@ -135,10 +148,19 @@ const styles = StyleSheet.create({
     flex: 1,
 
   },
+  iconMenu: {
+    fontSize:60,
+    color: colors.colorBlueOnLeftTopLogo
+  },
+  textMenu : {
+    fontSize: 16,
+    color:colors.black,
+    fontWeight: 'bold',
+  },
   menuStyle: {
     backgroundColor: colors.white,
     borderWidth: 1,
-    borderRadius: 2,
+    borderRadius: 20,
     borderColor: '#ddd',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

@@ -67,7 +67,7 @@ const AppSwitchNavigatior = (signedIn = false) => {
       MenuScreen: { screen: AppFunctionStackNavigator },
     },
     {
-      initialRouteName: signedIn ? 'LoginScreen' : 'MenuScreen',
+      initialRouteName: signedIn ? 'MenuScreen' : 'LoginScreen',
     });
 }
 
@@ -82,7 +82,7 @@ class AppStack extends Component {
   render() {
     // if (this.state.isLoading) return null
     let loggedIn = false
-    if (this.props.auth.token) {
+    if (this.props.auth.token !== '') {
       loggedIn = true
     }
 

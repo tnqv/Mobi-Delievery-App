@@ -36,6 +36,7 @@ class OrderDetail extends Component {
       test: [
 
       ],
+      changedItems:[],
       mergeList: [],
       orderServices : [
         {
@@ -258,13 +259,16 @@ class OrderDetail extends Component {
   }
 
 
-  async componentDidMount () {
+   componentDidMount () {
     //   this.state.mergeList = Object.assign({},this.state.serviceOfUser,this.state.apiData);
     // this.state.mergeList = _.mergeWith({}, this.state.apiData, this.state.services, function(a, b) {
     //     if (_.isArray(a)) {
     //       return b.concat(a);
     //     }
     //   });
+    this.props.navigation.state.params
+
+
     let categories = this.state.apiData;
     let orderServices = this.state.orderServices;
     for(let category of categories){
@@ -294,7 +298,7 @@ class OrderDetail extends Component {
 
     //         }
     // });
-      console.log(this.state.mergeList);
+    //   console.log(this.state.mergeList);
 
     // this.state.mergeList = this.states.service.apiData.map(object =>{
     //     return Object.assign(
@@ -421,6 +425,7 @@ class OrderDetail extends Component {
   _updateQuantityPress = (item,operator) => {
 
       let items = this.state.mergeList;
+      let changedItems = this.state.changedItems;
       let indexOfCategory = this.findIndexByAttribute(items,'ID',item.service.category_id);
 
       let indexOfItem = this.findIndexByAttribute(items[indexOfCategory].services,'name',item.name);
@@ -435,10 +440,36 @@ class OrderDetail extends Component {
         }
       }
 
+      let temp = items[indexOfCategory].services[indexOfItem]
+      let newChangedItems = this._setNewQuantity(temp)
+      console.log(newChangedItems)
       this.setState({
           mergeList: items,
+          changedItems: newChangedItems,
           refresh: !this.state.refresh,
       })
+      console.log(this.state.changedItems);
+  }
+
+  _setNewQuantity(item){
+      let listChangedItem = this.state.changedItems;
+      let isContained = false;
+      if(listChangedItem.length === 0){
+          listChangedItem.push(item);
+      }else{
+        for(let index in listChangedItem){
+            if(listChangedItem[index].service_id === item.service_id){
+                listChangedItem[index].quantity = item.quantity
+                isContained = true;
+            }
+         }
+         if(!isContained){
+            listChangedItem.push(item);
+         }
+
+      }
+
+      return listChangedItem
   }
 
   _renderItemInDialog = ({item,index,key}) => {

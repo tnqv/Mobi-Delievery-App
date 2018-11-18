@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View,Text, StyleSheet, ImageBackground,Image} from 'react-native';
+import {View,Text, StyleSheet, ImageBackground,Image,NativeModules} from 'react-native';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as appActions from '../actions';
@@ -7,12 +7,84 @@ import colors from '../config/colors'
 import { Container, Button, Body, Spinner,Content, Card, Form,Item,Input, Label, CardItem } from 'native-base';
 // import { loginRequest } from '../actions';
 
+const SweetAlertNative = NativeModules.RNSweetAlert;
+
 class LoginPage extends Component {
 
   constructor(props) {
     super(props);
     this.state = { usernameInput: '', passwordInput: '' };
 
+  }
+
+  showNormalDialog(placedOrder){
+    SweetAlertNative.showSweetAlert(
+      {
+          title: 'Xác nhận',
+          subTitle: '',
+          confirmButtonTitle: 'OK',
+          confirmButtonColor: '#000',
+          otherButtonTitle: 'Huỷ bỏ',
+          otherButtonColor: '#dedede',
+          type: 'normal',
+          cancelText: "Huỷ bỏ",
+          contentText: 'Bạn có xác nhận muốn tạo đơn hàng ?',
+          cancellable: true,
+        },
+        successCallback =>{
+          this.props.onCreatedPressed(this.props.login.token,placedOrder);
+
+        },
+        errorCallback => {
+
+        }
+    )
+
+  }
+
+  showSuccessDialog(message){
+    SweetAlertNative.showSweetAlert(
+      {
+          title: 'Xác nhận',
+          subTitle: '',
+          confirmButtonTitle: 'OK',
+          confirmButtonColor: '#000',
+          type: 'success',
+          cancelText: "",
+          contentText: message,
+          cancellable: false,
+        },
+        successCallback =>{
+            // alert(successCallback);
+            NavigatorService.goBackToMainTabBar('OrderInfo')
+        },
+        errorCallback => {
+            // alert(errorCallback);
+        }
+    )
+  }
+
+  showErrorDialog(message){
+    SweetAlertNative.showSweetAlert(
+      {
+          title: 'Lỗi xảy ra',
+          subTitle: '',
+          confirmButtonTitle: 'OK',
+          confirmButtonColor: '#000',
+          type: 'error',
+          cancelText: "",
+          contentText: message,
+          cancellable: false,
+        },
+        successCallback =>{
+            // alert(successCallback);
+            this.props.removeErrorAfterConfirmDialog();
+        },
+        errorCallback => {
+            this.props.removeErrorAfterConfirmDialog();
+            // alert(errorCallback);
+        }
+    )
   }
 
   render() {
@@ -75,7 +147,7 @@ class LoginPage extends Component {
                                   onPress={()=>{
                                     const {usernameInput, passwordInput} = this.state;
                                     if (!usernameInput.length || !passwordInput.length) {
-                                        alert('You must enter username and password');
+                                        alert('Hãy nhập tài khoản hoặc mật khẩu');
                                         return;
                                     }
                                     this.props.onLogin({username: usernameInput, password: passwordInput,from : fromScreen});
@@ -95,7 +167,7 @@ class LoginPage extends Component {
 
           {
              this.props.account.loading ?
-                  <Spinner
+                <Spinner
                   style={{
                     width: 100,
                     height: 100,
@@ -111,7 +183,7 @@ class LoginPage extends Component {
 
           {
             this.props.account.error ?
-            <Text> Error occur </Text> : null
+            this.showErrorDialog("Sai tài khoản hoặc mật khẩu") : null
           }
 
     </Container>
@@ -154,9 +226,9 @@ function mapDispatchToProps(dispatch) {
     onLogin: (accountLogin) => {
       dispatch(appActions.actions.loginRequest(accountLogin));
     },
-    onFacebookLogin: (fbToken) => {
-      dispatch(appActions.actions.loginFacebookRequest(fbToken));
-    },
+    removeErrorAfterConfirmDialog: () => {
+      dispatch(appActions.actions.okFromDialog());
+    }
     //Not necessary !
     // onSuccessFetch: () => {
     //     dispatch(fetchSuccessAction());
