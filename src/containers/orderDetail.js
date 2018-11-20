@@ -1,276 +1,40 @@
 import React, { Component } from 'react';
-import {View, Image, FlatList,SectionList,StyleSheet,Modal,Alert, Platform,TouchableOpacity} from 'react-native';
+import {View, Image, FlatList,SectionList,StyleSheet,Modal,Alert, Platform,TouchableOpacity,NativeModules} from 'react-native';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as appActions from '../actions';
 import colors from '../config/colors';
-import { Container, Header, Left, Body,Footer, Right, FooterTab,Col, Card, CardItem, Title,Content, List, ListItem,Badge,Text ,Icon, Accordion, Button} from 'native-base';
+import { Container, Header, Left, Body,Footer, Right,Grid,Row,Col, Card, CardItem, Title,Content, Spinner, ListItem,Badge,Text ,Icon, Accordion, Button,FooterTab} from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Dialog,{ SlideAnimation,DialogButton } from 'react-native-popup-dialog';
 import Timeline from 'react-native-timeline-listview';
+import NavigatorService from '../services/navigator';
 import _ from 'lodash';
 
-
+const SweetAlertNative = NativeModules.RNSweetAlert;
 
 class OrderDetail extends Component {
 
   constructor(props) {
     super(props);
+    //this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+    this._onModalConfirmedPress = this._onModalConfirmedPress.bind(this);
     this.state = {
       visible: false,
-      data : [
-        {
-          "test":"test"
-        },{
-          "test":"test"
-        },
-        {
-          "test":"test"
-        },
-      ],
-      category: [
-        { title: "First Element", content: "Lorem ipsum dolor sit amet" },
-        { title: "Second Element", content: "Lorem ipsum dolor sit amet" },
-        { title: "Third Element", content: "Lorem ipsum dolor sit amet" }
-      ],
-      test: [
-
-      ],
-      changedItems:[],
+      order: this.props.navigation.state.params.orderParam,
+      changedItems: this.props.navigation.state.params.orderParam.order_service_list.map(service => Object.assign({},service,{name : service.service.name})),
+      orderConfirmedItems: [],
+      orderTotal: this.props.navigation.state.params.orderParam.total,
       mergeList: [],
-      orderServices : [
-        {
-            "placed_order_id": 16,
-            "service_id": 1,
-            "service": {
-                "name": "Từ 1kg - 3kg/Máy/Lượt",
-                "price": 40000,
-                "description": "",
-                "category_id" : 1,
-            },
-            "description": "",
-            "quantity": 2,
-            "price": 60000
-        },
-        {
-            "placed_order_id": 16,
-            "service_id": 2,
-            "service": {
-                "name": "Từ 3kg - 5kg/Máy/Lượt",
-                "price": 20000,
-                "description": "",
-                "category_id" : 1,
-            },
-            "description": "",
-            "quantity": 1,
-            "price": 80000
-        },
-      ],
-      apiData : [
-        {
-            "ID" : 1,
-            "name": "Combo Giặt + Sấy + Xả Quần áo",
-            "description": "Giặt quần áo theo combo",
-            "services": [
-                {
-                    "name": "Từ 3kg - 5kg/Máy/Lượt",
-                    "price": 65000,
-                    "description": "Gói combo giặt quần áo từ 3kg - 5kg/Máy/Lượt không giặt chung",
-                    "image_url": "123"
-                },
-                {
-                    "name": "Từ 1kg - 3kg/Máy/Lượt",
-                    "price": 49000,
-                    "description": "Gói combo giặt quần áo từ 1kg - 3kg/Máy/Lượt không giặt chung"
-                },
-                {
-                    "name": "Từ 5kg - 7kg/Máy/Lượt",
-                    "price": 75000,
-                    "description": "Gói combo giặt quần áo từ 5kg - 7kg/Máy/Lượt không fgiặt chung với khách khác"
-                },
-                {
-                    "name": "Combo Chống Dị Ứng/7kg/Máy/Lượt",
-                    "price": 80000,
-                    "description": "Gói combo giặt chống dị ứng với da nhạy cảm/7kg/Máy/Lượt"
-                },
-                {
-                    "name": "Combo Em Bé/7kg/Máy/Lượt",
-                    "price": 80000,
-                    "description": "Gói combo giặt cho em Bé/7kg/Máy/Lượt"
-                },
-                {
-                    "name": "Vệ sinh giày/Đôi (Lấy giày sau 1 ngày)",
-                    "price": 163000,
-                    "description": "Vệ sinh giày/Đôi (Lấy giày sau 1 ngày)"
-                }
-            ]
-        },
-        {
-            "ID" : 2,
-            "name": "Combo chăn màn",
-            "description": "Giặt chăn màn theo combo",
-            "services": [
-                {
-                    "name": "Trọn bộ",
-                    "price": 80000,
-                    "description": "Giặt trọn bộ chăn màn"
-                },
-                {
-                    "name": "2 Chăn Bông",
-                    "price": 80000,
-                    "description": "Với gói 2 Chăn Bông"
-                },
-                {
-                    "name": "1 Chăn Bông Lớn",
-                    "price": 80000,
-                    "description": "Với gói 1 Chăn Bông Lớn"
-                }
-            ]
-        },
-        {
-            "ID" : 3,
-            "name": "Combo Thú bông",
-            "description": "Giặt thú bông theo combo",
-            "services": [
-                {
-                    "name": "Kích cỡ (5 - 30)x(5 - 30)cm/Máy/Lượt",
-                    "price": 80000,
-                    "description": ""
-                },
-                {
-                    "name": "Kích cỡ (50 - 70)x (30x40)cm/Máy/Lượt",
-                    "price": 80000,
-                    "description": ""
-                },
-                {
-                    "name": "Kích Cỡ 100x60 (cm)/Máy/Lượt",
-                    "price": 80000,
-                    "description": ""
-                }
-            ]
-        },
-        {
-            "ID" : 4,
-            "name": "Dịch vụ giặt hấp (không bao gồm ủi)",
-            "description": "Giặt hấp quần áo nhưng không bao gồm ủi",
-            "services": [
-                {
-                    "name": "Áo/cái",
-                    "price": 25000,
-                    "description": ""
-                },
-                {
-                    "name": "Bộ mền + Drap",
-                    "price": 120000,
-                    "description": ""
-                },
-                {
-                    "name": "Mền/ Drap (1,6m x 2m)",
-                    "price": 65000,
-                    "description": ""
-                },
-                {
-                    "name": "Màn cửa - cái",
-                    "price": 50000,
-                    "description": ""
-                },
-                {
-                    "name": "Túi xách - cái",
-                    "price": 120000,
-                    "description": ""
-                },
-                {
-                    "name": "Thú bông - cái",
-                    "price": 70000,
-                    "description": ""
-                },
-                {
-                    "name": "Bộ mền - cái",
-                    "price": 90000,
-                    "description": ""
-                },
-                {
-                    "name": "Soire - cái",
-                    "price": 250000,
-                    "description": ""
-                },
-                {
-                    "name": "Áo da - cái",
-                    "price": 120000,
-                    "description": ""
-                },
-                {
-                    "name": "Đầm dạ hội - cái",
-                    "price": 120000,
-                    "description": ""
-                },
-                {
-                    "name": "Áo khoác dài/ Đầm dài - cái",
-                    "price": 90000,
-                    "description": ""
-                },
-                {
-                    "name": "Áo Khoác/ Đầm Ngắn - cái",
-                    "price": 65000,
-                    "description": ""
-                },
-                {
-                    "name": "Bộ Vest",
-                    "price": 90000,
-                    "description": ""
-                },
-                {
-                    "name": "Áo dài nhung, lụa, gấm - cái",
-                    "price": 90000,
-                    "description": ""
-                },
-                {
-                    "name": "Áo Vest - cái",
-                    "price": 65000,
-                    "description": ""
-                },
-                {
-                    "name": "Quần/Cái",
-                    "price": 25000,
-                    "description": ""
-                }
-            ]
-        },
-        {
-            "ID" : 5,
-            "name": "Combo Rèm Cửa",
-            "description": "Giặt rèm cửa theo combo",
-            "services": [
-                {
-                    "name": "Bộ Rèm Nhỏ/Máy/Lượt",
-                    "price": 80000,
-                    "description": ""
-                },
-                {
-                    "name": "Bộ Rèm Chuẩn/ Máy/ Lượt",
-                    "price": 80000,
-                    "description": ""
-                }
-            ]
-        }
-      ],
       refresh: true,
     }
   }
 
 
    componentDidMount () {
-    //   this.state.mergeList = Object.assign({},this.state.serviceOfUser,this.state.apiData);
-    // this.state.mergeList = _.mergeWith({}, this.state.apiData, this.state.services, function(a, b) {
-    //     if (_.isArray(a)) {
-    //       return b.concat(a);
-    //     }
-    //   });
-    this.props.navigation.state.params
 
-
-    let categories = this.state.apiData;
-    let orderServices = this.state.orderServices;
+    let categories = this.props.service.data;
+    let orderServices = this.state.order.order_service_list;
     for(let category of categories){
         let newCategory = {
             ID : category.ID,
@@ -282,43 +46,29 @@ class OrderDetail extends Component {
             let isAssigned = false;
             for( let itemOrderService of orderServices){
                 if(item.name === itemOrderService.service.name){
-                    newCategory.services.push(Object.assign({},item,itemOrderService));
+                    newCategory.services.push(Object.assign({},item,{price: item.price},itemOrderService));
                     isAssigned = true;
                 }
             }
             if(!isAssigned){
-                newCategory.services.push(Object.assign({},item,{quantity: 0 , price: 0,category_id: category.ID}));
+                newCategory.services.push(Object.assign({},item,{service_id: item.ID, name: item.name, quantity: 0 , price: item.price,category_id: category.ID}));
             }
         }
         this.state.mergeList.push(newCategory);
     }
-
-    // this.state.mergeList = this.state.apiData.map(object => {
-    //         for(let serviceFromCate of object.services){
-
-    //         }
-    // });
-    //   console.log(this.state.mergeList);
-
-    // this.state.mergeList = this.states.service.apiData.map(object =>{
-    //     return Object.assign(
-    //       {},
-    //       this.state.serviceOfUser,
-
-    //     )
-    // });
-
   }
+
   _renderItem = ({item,index,section}) => {
     return (
         <ListItem style={{borderBottomWidth: 0}}>
           <Left>
-            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >3 </Text>
+            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >{ item.quantity }</Text>
             <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} > x </Text>
-            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} > Từ 3kg - 5kg/Máy/Lượt</Text>
+            {/* { item.service.name ? */}
+            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >{ item.name }</Text>
           </Left>
           <Right>
-            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >30.000 </Text>
+            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >{item.price}đ</Text>
           </Right>
         </ListItem>
     )
@@ -422,12 +172,90 @@ class OrderDetail extends Component {
 //     })
 // }
 
-  _updateQuantityPress = (item,operator) => {
 
+
+    _showUpdateConfirmDialog(message,statusId,servicesOrder){
+        SweetAlertNative.showSweetAlert(
+        {
+            title: 'Xác nhận',
+            subTitle: '',
+            confirmButtonTitle: 'OK',
+            confirmButtonColor: '#000',
+            otherButtonTitle: 'Huỷ bỏ',
+            otherButtonColor: '#dedede',
+            type: 'normal',
+            cancelText: "Huỷ bỏ",
+            contentText: message,
+            cancellable: true,
+            },
+            successCallback =>{
+                if(statusId === 4){
+                    servicesOrder = servicesOrder.map((service) => { return Object.assign({},service,{placed_order_id: this.state.order.ID}) });
+                }
+                this.props.onUpdatedPressed(this.props.account.token,this.props.account.user.ID,this.state.order.ID,statusId,servicesOrder);
+            },
+            errorCallback => {
+
+            }
+        )
+
+    }
+
+    showSuccessDialog(message){
+        SweetAlertNative.showSweetAlert(
+          {
+              title: 'Xác nhận',
+              subTitle: '',
+              confirmButtonTitle: 'OK',
+              confirmButtonColor: '#000',
+              type: 'success',
+              cancelText: "",
+              contentText: message,
+              cancellable: false,
+            },
+            successCallback =>{
+                // alert(successCallback);
+                this.props.removeDialog();
+                this.props.navigation.pop(1);
+
+            },
+            errorCallback => {
+                // alert(errorCallback);
+                this.props.removeDialog();
+            }
+        )
+      }
+
+      showErrorDialog(message){
+        SweetAlertNative.showSweetAlert(
+          {
+              title: 'Lỗi xảy ra',
+              subTitle: '',
+              confirmButtonTitle: 'OK',
+              confirmButtonColor: '#000',
+              type: 'error',
+              cancelText: "",
+              contentText: message,
+              cancellable: false,
+            },
+            successCallback =>{
+                this.props.removeDialog();
+                // alert(successCallback);
+            },
+            errorCallback => {
+                this.props.removeDialog();
+                // alert(errorCallback);
+            }
+        )
+      }
+
+  _updateQuantityPress = (item,operator) => {
       let items = this.state.mergeList;
       let changedItems = this.state.changedItems;
-      let indexOfCategory = this.findIndexByAttribute(items,'ID',item.service.category_id);
-
+      console.log("debug item");
+      console.log(item);
+      let indexOfCategory = this.findIndexByAttribute(items,'ID',item.category_id);
+    //   console.log(items[indexOfCategory].services);
       let indexOfItem = this.findIndexByAttribute(items[indexOfCategory].services,'name',item.name);
       let value = items[indexOfCategory].services[indexOfItem].quantity;
       if(operator === '+'){
@@ -442,34 +270,57 @@ class OrderDetail extends Component {
 
       let temp = items[indexOfCategory].services[indexOfItem]
       let newChangedItems = this._setNewQuantity(temp)
-      console.log(newChangedItems)
+
+    //   let newTotal = newChangedItems.reduce((accumulator,item) => {
+    //         return accumulator + item.price
+    //   },0);
+
       this.setState({
           mergeList: items,
           changedItems: newChangedItems,
-          refresh: !this.state.refresh,
-      })
-      console.log(this.state.changedItems);
+        //   refresh: !this.state.refresh,
+        //   orderTotal: newTotal,
+      });
+
   }
 
   _setNewQuantity(item){
       let listChangedItem = this.state.changedItems;
       let isContained = false;
+
+    //   if(item.quantity === 0) return;
+
       if(listChangedItem.length === 0){
           listChangedItem.push(item);
       }else{
         for(let index in listChangedItem){
             if(listChangedItem[index].service_id === item.service_id){
-                listChangedItem[index].quantity = item.quantity
+                listChangedItem[index].quantity = item.quantity;
+                listChangedItem[index].price = item.quantity * item.price;
                 isContained = true;
             }
          }
          if(!isContained){
             listChangedItem.push(item);
          }
-
       }
 
+      listChangedItem = listChangedItem.filter((item) => { return item.quantity !== 0 });
+
       return listChangedItem
+  }
+
+  _onModalConfirmedPress(){
+    let newChangedItems = this.state.changedItems;
+    let newTotal = newChangedItems.reduce((accumulator,item) => {
+        return accumulator + item.price
+    },0);
+
+    this.setState({
+        orderConfirmedItems: newChangedItems,
+        orderTotal: newTotal,
+        refresh: !this.state.refresh,
+    });
   }
 
   _renderItemInDialog = ({item,index,key}) => {
@@ -494,7 +345,6 @@ class OrderDetail extends Component {
                 <Text>{"   "}{item.quantity}{"   "}</Text>
                 <TouchableOpacity
                  onPress={()=>{
-                    console.log(item);
                     this._updateQuantityPress(item,'+');
                 }}>
                 <Icon style={{fontSize: 15, color: colors.colorBlueOnLeftTopLogo}}
@@ -508,26 +358,53 @@ class OrderDetail extends Component {
       </ListItem>
     )
   }
-  _renderServicesItem = ({item,index,section}) => {
-    return (
-        <ListItem style={{borderBottomWidth: 0}}>
-          <Left>
-            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >3 </Text>
-            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} > x </Text>
-            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} > Từ 3kg - 5kg/Máy/Lượt</Text>
-          </Left>
-          <Right>
-            <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >30.000 </Text>
-          </Right>
-        </ListItem>
-    )
-  }
+//   _renderServicesItem = ({item,index,section}) => {
+//     return (
+//         <ListItem style={{borderBottomWidth: 0}}>
+//           <Left>
+//             <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >{ item.quantity }</Text>
+//             <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} > x </Text>
+//             <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >{ item.name }</Text>
+//           </Left>
+//           <Right>
+//             <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >30.000 </Text>
+//           </Right>
+//         </ListItem>
+//     )
+//   }
 
 
   render() {
+    const orderDate = new Date(this.state.order.time_placed);
     // const { state, actions } = this.props;
     return (
       <Container style={{backgroundColor: colors.lightgray}}>
+            {
+                    this.props.placedorder.loading || this.state.loading ?
+                        <Spinner
+                        style={{
+                            width: 100,
+                            height: 100,
+                            left: `50%`,
+                            top: `50%`,
+                            transform: [{ translateX: -50},{translateY: -50 }],
+                            justifyContent:'center',
+                            position: 'absolute',}}
+                        color='blue'>
+                        </Spinner> : null
+
+                }
+                {
+
+                    this.props.placedorder.success ?
+                    this.showSuccessDialog(`Cập nhật đơn hàng thành công`) : null
+                }
+
+                {
+                    this.props.placedorder.error ?
+                    this.showErrorDialog(`${this.props.placedorder.error}`) : null
+                }
+
                 <Modal
                 animationType="slide"
                 transparent={false}
@@ -553,12 +430,14 @@ class OrderDetail extends Component {
                                 {/* </View> */}
                         </View>
                         <Footer style={{backgroundColor:colors.white,borderTopWidth:1,borderTopColor:colors.gray}}>
+                            <FooterTab>
                                     <Button primary
                                             style={{flex:1,justifyContent: 'center'}}
                                             onPress={()=>{
                                                 this.setState({
                                                     visible: false,
-                                            })
+                                                })
+                                                this._onModalConfirmedPress()
                                         }}>
                                         <Text>Xác nhận</Text>
                                     </Button>
@@ -573,6 +452,7 @@ class OrderDetail extends Component {
                                             >
                                         <Text>Huỷ</Text>
                                     </Button>
+                            </FooterTab>
                         </Footer>
 
 
@@ -605,24 +485,95 @@ class OrderDetail extends Component {
                               marginLeft: 20,
                               marginRight: 20}}>
                   <Left style={{flexDirection: 'row', textAlign: 'left', textAlignVertical: 'center',flex:2}}>
-                      <Text style={{color: colors.gray, fontWeight: 'bold',fontSize:18}}>Mã hoá đơn</Text>
+                      <Text style={{color: colors.gray, fontWeight: 'bold',fontSize:18}}>Mã hoá đơn
                       <Text> - </Text>
-                      <Text style={{color: colors.gray}}>#123456</Text>
+                      <Text style={{color: colors.gray,fontSize:16,fontWeight: 'normal'}}>#{this.state.order.order_code}</Text>
+                      </Text>
+
                   </Left>
                   <Right style={{flex:1}}>
-                    <Text>420000đ</Text>
+                    <Text>{this.state.order.total}đ</Text>
                   </Right>
                 </View>
                 <CardItem style={{marginBottom:0}}>
-                    <Text style={{color: colors.colorBlueOnLeftTopLogo}}>Status</Text>
+                    <Text style={{color: colors.colorBlueOnLeftTopLogo}}>{this.state.order.order_status_list[0].description}</Text>
                 </CardItem>
 
 
                 <View style={{ marginLeft: 20,
                               marginRight: 20,
                               marginBottom: 15}}>
-                      <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >Thời gian đặt hàng : 22:30:22 23/10/2018 </Text>
+                      <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}} >Thời gian đặt hàng : {`${orderDate.getDate()}-${orderDate.getMonth() +1 }-${orderDate.getFullYear()} ${orderDate.getHours()}:${orderDate.getMinutes()}:${orderDate.getSeconds()}`} </Text>
                 </View>
+            </Card>
+            <Card style={{ marginTop: 15, marginBottom: 15 }}>
+                <Grid>
+                    <Row>
+                        <Col>
+                            <CardItem style={{marginBottom:0}}>
+                                    <Text style={{color: colors.gray,fontWeight: 'bold',fontSize:16}}>Tên người nhận : </Text>
+                            </CardItem>
+                        </Col>
+                        <Col>
+                            <CardItem style={{marginBottom:0}}>
+                                    <Text style={{color: colors.gray,fontWeight: 'bold',fontSize:14}}>Số điện thoại người nhận : </Text>
+                            </CardItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <View  style={{marginLeft: 20,
+                                        marginRight: 20,
+                                        marginBottom: 15,
+                                        }}>
+                                <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}}> {this.state.order.receiver_name } </Text>
+                            </View>
+                        </Col>
+                        <Col>
+                            <View  style={{marginLeft: 20,
+                                        marginRight: 20,
+                                        marginBottom: 15,
+                                        }}>
+                                <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}}>  {this.state.order.receiver_phone } </Text>
+                            </View>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <CardItem style={{marginBottom:0}}>
+                                    <Text style={{color: colors.gray,fontWeight: 'bold',fontSize:16}}>Khối lượng gửi : </Text>
+                            </CardItem>
+                        </Col>
+                        <Col>
+                            <CardItem style={{marginBottom:0}}>
+                                    <Text style={{color: colors.gray,fontWeight: 'bold',fontSize:16}}>Ghi chú : </Text>
+                            </CardItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <View  style={{marginLeft: 20,
+                                        marginRight: 20,
+                                        marginBottom: 15,
+                                        }}>
+                                <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}}> { this.state.order.capacity } </Text>
+                            </View>
+                        </Col>
+                        <Col>
+                            <View  style={{marginLeft: 20,
+                                        marginRight: 20,
+                                        marginBottom: 15,
+                                        }}>
+                                <Text style={{color: colors.gray, fontWeight: 'normal',fontSize:14}}> { this.state.order.note } </Text>
+                            </View>
+                        </Col>
+                    </Row>
+
+
+                </Grid>
+                {/* <CardItem style={{marginBottom:0}}>
+                        <Text style={{color: colors.gray,fontWeight: 'bold',fontSize:16}}>Thông tin vận chuyển : </Text>
+                </CardItem> */}
             </Card>
             <Card style={{ marginTop: 15, marginBottom: 15 }}>
 
@@ -633,9 +584,10 @@ class OrderDetail extends Component {
                 <Timeline
                 style={{ marginTop: 10}}
                 showTime={false}
+                titleStyle={{fontSize: 13, marginTop: -10}}
                 data={[
-                    {title: 'Địa chỉ giao/nhận đồ', description: '399 Lý thái tổ'},
-                    {title: 'Địa chỉ giặt', description: 'Số 1 Nguyễn Văn Quá'},
+                    {title: 'Địa chỉ giao/nhận đồ', description: this.state.order.delivery_address},
+                    {title: 'Địa chỉ giặt', description: this.state.order.store.address},
                 ]}
                 />
 
@@ -659,22 +611,40 @@ class OrderDetail extends Component {
                             <Text style={{color: colors.gray,fontWeight: 'bold',fontSize:16}}>Các dịch vụ sử dụng : </Text>
                     </Left>
                     <Right>
+                        {this.state.order.current_status_id === 3 ?
                         <Text style={{color: colors.colorBlueOnLeftTopLogo}} onPress={() => {
                             this.setState({ visible: true });
-                        }}>Chỉnh sửa</Text>
+                        }}>Chỉnh sửa</Text> :
+                        null }
                     </Right>
                 </CardItem>
-                <CardItem>
-                    { this.state.data.length !== 0 ?
+                {this.state.order.current_status_id === 3 ?
+                    <CardItem>
+
+                        { !this.state.orderConfirmedItems || this.state.orderConfirmedItems.length === 0  ?
+                            <Text> Hiện tại chưa có dịch vụ </Text> :
+                            <FlatList
+                                style={{backgroundColor:'transparent'}}
+                                data={this.state.orderConfirmedItems}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={this._renderItem}
+                                />
+                        }
+                    </CardItem>
+                :
+                    <CardItem>
+
+                    { !this.state.order.order_service_list || this.state.order.order_service_list.length === 0  ?
+                        <Text> Hiện tại chưa có dịch vụ </Text> :
                         <FlatList
                             style={{backgroundColor:'transparent'}}
-                            data={this.state.data}
+                            data={this.state.order.order_service_list.map(service => Object.assign({},service,{name : service.service.name}))}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={this._renderItem}
-                            /> :
-                        null
+                            />
                     }
-                </CardItem>
+                    </CardItem>
+                }
             </Card>
 
 
@@ -693,30 +663,54 @@ class OrderDetail extends Component {
                       <Text style={{color: colors.gray,fontWeight: 'bold',fontSize:16}}>Tổng cộng : </Text>
                   </Left>
                   <Right>
-                      <Text style={{color: colors.gray}}>90.000</Text>
+                      <Text style={{color: colors.gray}}>{this.state.order.current_status_id === 3 ? this.state.orderTotal : this.state.order.total}đ</Text>
                   </Right>
 
               </CardItem>
 
             </Card>
           </Content>
-          <Button onPress={() => { }}
+
+        { this.state.order.current_status_id !== 3 ? null :
+        <View>
+          <Button
+          onPress={() => {
+            this._showUpdateConfirmDialog('Bạn có muốn xác nhận đơn hàng và các dịch vụ ?',4,this.state.changedItems);
+          }}
           style={{ alignSelf: 'center', position: 'absolute', elevation: 4, height: 70, width: 70, bottom: 0, borderWidth: 1, borderColor: colors.white, borderRadius: 35, backgroundColor: colors.lightGreen, justifyContent: 'center' }} active>
           <Icon active name="check" type="FontAwesome" style={{ color: colors.white }} />
           </Button>
+
           <Footer>
                 <FooterTab style={{backgroundColor:colors.colorBlueOnLeftTopLogo}}>
-                    <Button>
+
+                    <Button
+                        onPress={() => {
+                            this._showUpdateConfirmDialog('Bạn có chắc muốn từ chối đơn hàng này ?',13);
+                        }}>
                         <Text style={{color:colors.white}}>Từ chối</Text>
                     </Button>
-                    <Button style={{ flex: 0, width: 70 }}>
-                    <Icon active />
+
+                    <Button
+                    onPress={() => {
+                        this._showUpdateConfirmDialog('Bạn có muốn xác nhận đơn hàng và các dịch vụ ?',4,this.state.changedItems);
+                      }}
+                    style={{ flex: 0, width: 70 }}>
+
+                        <Icon active />
+
                     </Button>
-                    <Button>
+
+                    <Button
+                        onPress={() => {
+                            this._showUpdateConfirmDialog('Bạn có muốn xác nhận là đơn hàng này không thể lấy ?',11);
+                        }}>
                         <Text style={{color:colors.white}}>Không thể lấy đồ</Text>
                     </Button>
                 </FooterTab>
             </Footer>
+            </View>
+        }
 
         </Container>
 
@@ -752,12 +746,20 @@ const styles = StyleSheet.create({
 function mapStateToProps(state) {
   return {
     state: state,
-    login: state.login,
+    account: state.login,
+    service: state.service,
+    placedorder: state.placedorder,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
+       onUpdatedPressed: (token,userId,orderId,statusId,servicesOrder) => {
+        dispatch(appActions.actions.updateOrderRequest({token: token,userId: userId,orderId: orderId,statusId:statusId,servicesOrder: servicesOrder}));
+      },
+      removeDialog: () => {
+        dispatch(appActions.actions.clearDialog());
+      }
     // actions: bindActionCreators(appActions.actions, dispatch),
   };
 }

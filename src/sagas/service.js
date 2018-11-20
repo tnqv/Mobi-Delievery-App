@@ -1,11 +1,8 @@
 import { GET_SERVICES_API,GET_SERVICES_API_SUCCEED,GET_SERVICES_API_FAILED } from '../actions/actionTypes';
-import { NavigationActions } from 'react-navigation';
 //Saga effects
 import { put, takeLatest,takeEvery,call } from 'redux-saga/effects';
 import { Api } from './api';
 import NavigatorService from '../services/navigator';
-import deviceStorage from '../services/deviceStorage';
-
 
 
 function* fetchServices(){

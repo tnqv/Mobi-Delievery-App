@@ -18,7 +18,6 @@ export default function (state = initialState, action) {
         error: null,
       }
     case API_LOGIN_REQUEST_SUCCEEDED:
-      console.log("yield success",state);
       return {
         ...state,
         error: null,

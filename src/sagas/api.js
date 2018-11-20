@@ -25,8 +25,6 @@ function* loginFromApi(usernameFromAction,passwordFromAction){
 
 function* updateStatusApi(token,userId,orderId,statusId,serviceOrders){
   let formData = new FormData();
-  console.log("in api");
-  console.log(token);
   let dataParam = statusId !== 4 ? { 'user_id': userId } : { 'user_id': userId,'service_orders': JSON.stringify(serviceOrders)};
   for ( let key in dataParam ) {
     formData.append(key, dataParam[key]);
@@ -48,12 +46,6 @@ function* updateStatusApi(token,userId,orderId,statusId,serviceOrders){
 }
 
 function* fetchActiveOrdersApi(token,deliveryId){
-  // const response = yield axios.get(baseUrl + `/user/${deliveryId}/delivery/active`,
-  // {
-  //   headers: {
-  //       "Authorization": token
-  //   }
-  // });
   const response = yield axios({
     method: 'GET',
     url: baseUrl + `/user/${deliveryId}/delivery/active`,
@@ -66,9 +58,33 @@ function* fetchActiveOrdersApi(token,deliveryId){
   return activeOrders;
 }
 
+function* fetchInStoreOrdersApi(token,deliveryId){
+  const response = yield axios({
+    method: 'GET',
+    url: baseUrl + `/user/${deliveryId}/delivery/instore`,
+    headers: {
+        "Authorization": token,
+    }
+  });
+  const inStoreOrders = yield response.status === 200 ? response.data.records : null;
+
+  return inStoreOrders;
+}
+
+
+
+function* getServicesFromApi(){
+  const response = yield axios(baseUrl + '/category');
+
+  const services = yield response.status === 200 ? response.data.records : [];
+  return services;
+}
+
 
 export const Api = {
   loginFromApi,
   updateStatusApi,
   fetchActiveOrdersApi,
+  getServicesFromApi,
+  fetchInStoreOrdersApi,
 };

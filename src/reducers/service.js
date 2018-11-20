@@ -16,13 +16,11 @@ export default function (state = initialState, action) {
         ...state,
       }
     case GET_SERVICES_API_SUCCEED:
-      console.log("success");
       return {
         ...state,
         data: action.data
       }
     case GET_SERVICES_API_FAILED:
-      console.log("failed" + action.error);
       return {
         ...state,
         error: action.error,

@@ -34,6 +34,16 @@ class GetOrder extends Component {
     let tokenFromState = this.props.account.token;
     let userIdFromState = this.props.account.user.ID;
     this.props.onLoadActiveOrders({deliveryId : userIdFromState, token : tokenFromState});
+    this.willFocusSubscription = this.props.navigation.addListener(
+      'willFocus',
+      () => {
+        this.props.onLoadActiveOrders({deliveryId : userIdFromState, token : tokenFromState});
+      }
+    );
+  }
+
+  componentWillUnmount() {
+    this.willFocusSubscription.remove();
   }
 
   componentWillMount(){
@@ -57,9 +67,9 @@ class GetOrder extends Component {
 
     return (
       <TouchableOpacity onPress={() =>{
-        console.log("test");
         this.props.navigation.navigate('OrderDetail',{
           orderId: item.ID,
+          orderParam: item,
         });
         }}>
       <Card style={{ marginTop: 15, marginBottom: 15, marginLeft: 20, marginRight: 20 }}>
@@ -75,9 +85,14 @@ class GetOrder extends Component {
                   <Text style={{color: colors.gray}}>#{item.order_code}</Text>
               </Left>
               <Right style={{flex:1}}>
+                  { item.current_status_id === 3 ?
                   <Button info>
                     <Text style={{fontSize: 12,}}>Đang chờ</Text>
+                  </Button> :
+                  <Button success>
+                    <Text style={{fontSize: 10,}}>Đã xác nhận</Text>
                   </Button>
+                  }
               </Right>
         </View>
         <CardItem>

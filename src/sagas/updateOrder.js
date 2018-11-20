@@ -18,12 +18,12 @@ function* updateOrderFlow(action){
     let servicesOrder;
     let response;
     if(statusId === 4){
+      console.log(servicesOrder);
       servicesOrder = action.payload.servicesOrder;
       response = yield Api.updateStatusApi(token,userId,orderId,statusId,servicesOrder);
     }else{
       response = yield Api.updateStatusApi(token,userId,orderId,statusId);
     }
-
     if (response) {
       // This is a blocking call that would wait for the token to be stored,
       // or for the Promise to be resolved before proceeding to the next line

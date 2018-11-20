@@ -108,7 +108,7 @@ class LoginPage extends Component {
                       width: 250, height: 250,
                       justifyContent:'center',
                       alignSelf: 'center'}}
-            source={require('../assets/laundry2.png')}>
+            source={require('../assets/Delivery.png')}>
             </Image>
 
 
@@ -154,7 +154,7 @@ class LoginPage extends Component {
                                   }
 
                                   }>
-                              <Text style={{color:colors.white}}>Sign In</Text>
+                              <Text style={{color:colors.white}}>Đăng nhập</Text>
                           </Button>
 
                       </Body>

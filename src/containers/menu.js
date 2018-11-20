@@ -16,6 +16,10 @@ class Menu extends Component {
 
   }
 
+  componentDidMount(){
+    this.props.getServicesList();
+  }
+
   render() {
     // const { state, actions } = this.props;
     const { navigation } = this.props;
@@ -70,9 +74,9 @@ class Menu extends Component {
                                <TouchableOpacity
                                   style={styles.touchStyle}
                                   >
-                                   <Icon style={styles.iconMenu} name="sign-out" type='FontAwesome'></Icon>
+                                   <Icon style={styles.iconMenu} name="history" type='FontAwesome'></Icon>
 
-                                    <Text style={styles.textMenu}>Trạng thái</Text>
+                                    <Text style={styles.textMenu}>Lịch sử</Text>
 
                                 </TouchableOpacity>
                     </Row>
@@ -202,6 +206,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    getServicesList : () => {
+      dispatch(appActions.actions.serviceRequest());
+    },
     // actions: bindActionCreators(appActions.actions, dispatch)
   };
 }
